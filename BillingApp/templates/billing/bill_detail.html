@@ -1,0 +1,99 @@
+{% extends 'billing/base.html' %}
+
+{% block title %}Bill Detail{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4>Bill Details</h4>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <strong>Customer Email:</strong> {{ purchase.customer.email }}
+        </div>
+        <div class="mb-3">
+            <strong>Purchase ID:</strong> {{ purchase.purchase_id }}
+        </div>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Unit Price</th>
+                    <th>Quantity</th>
+                    <th>Tax %</th>
+                    <th>Tax Amount</th>
+                    <th>Total Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.product.product_id }}</td>
+                    <td>₹{{ item.unit_price|floatformat:2 }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.tax_percentage }}%</td>
+                    <td>₹{{ item.tax_amount|floatformat:2 }}</td>
+                    <td>₹{{ item.total_price|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="row">
+            <div class="col-md-8"></div>
+            <div class="col-md-4">
+                <table class="table table-sm">
+                    <tr>
+                        <td><strong>Total without tax:</strong></td>
+                        <td>₹{{ purchase.total_amount|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total tax:</strong></td>
+                        <td>₹{{ purchase.tax_amount|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Net amount:</strong></td>
+                        <td>₹{{ purchase.net_amount|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rounded amount:</strong></td>
+                        <td>₹{{ purchase.rounded_amount|floatformat:0 }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cash paid:</strong></td>
+                        <td>₹{{ purchase.cash_paid|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Balance:</strong></td>
+                        <td>₹{{ purchase.balance_amount|floatformat:2 }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="mb-3">
+            <h5>Balance Denomination:</h5>
+            <table class="table table-sm">
+                {% for balance_denom in balance_denominations %}
+                <tr>
+                    <td>₹{{ balance_denom.denomination_value }}:</td>
+                    <td>{{ balance_denom.count }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2">No balance to return</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="text-end">
+            <a href="{% url 'BillingApp:billing_form' %}" class="btn btn-primary">New Bill</a>
+            <a href="{% url 'BillingApp:purchase_history' %}" class="btn btn-secondary">View History</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

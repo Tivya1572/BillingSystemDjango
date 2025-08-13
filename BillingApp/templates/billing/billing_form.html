@@ -1,0 +1,133 @@
+{% extends 'billing/base.html' %}
+
+{% block title %}Create New Bill{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Billing Form -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4>Billing Page</h4>
+                </div>
+                <div class="card-body">
+                    <form id="billing-form" method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Customer Email -->
+                        <div class="mb-3">
+                            <label for="customer_email" class="form-label">Customer Email</label>
+                            <input type="email" class="form-control" id="customer_email" 
+                                   name="customer_email" required>
+                            
+                        </div>
+
+                        <!-- Bill Items -->
+                        <div class="mb-4">
+                            <label class="form-label">Bill Items</label>
+                            <div id="items-container">
+                                <div class="row item-row mb-2">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" 
+                                               name="product_id[]" placeholder="Product ID" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="number" class="form-control" 
+                                               name="quantity[]" placeholder="Quantity" min="1" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger btn-sm remove-item">×</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" id="add-new-item" class="btn btn-secondary btn-sm mt-2">Add New Item</button>
+                        </div>
+
+                        <hr>
+
+                        <!-- Denominations -->
+                        <div class="mb-4">
+                            <label class="form-label">Denominations</label>
+                            <div class="row">
+                                {% for denom in denominations %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">{{ denom.value }}</span>
+                                        <input type="number" class="form-control" 
+                                               name="count_{{ denom.value }}" min="0" value="0">
+                                        <span class="input-group-text">Count</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Cash Paid -->
+                        <div class="mb-3">
+                            <label for="cash_paid" class="form-label">Cash Paid</label>
+                            <input type="number" class="form-control" id="cash_paid" name="cash_paid" 
+                                   step="0.01" placeholder="Enter amount" required>
+                        </div>
+
+                        <!-- Form Buttons -->
+                        <div class="text-end">
+                            <button type="reset" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-success">Generate Bill</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product List -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5>Available Products</h5>
+                </div>
+                <div class="card-body">
+                    {% for product in products %}
+                    <div class="product-item mb-3 p-2 border rounded">
+                        <strong>{{ product.product_id }}</strong><br>
+                        <small>{{ product.name }}</small><br>
+                        <small>Price: ₹{{ product.price_per_unit }}</small><br>
+                        <small>Stock: {{ product.available_stocks }}</small><br>
+                        <small>Tax: {{ product.tax_percentage }}%</small>
+                    </div>
+                    {% empty %}
+                    <p>No products available. Please add products via admin panel.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+document.getElementById('add-new-item').addEventListener('click', function() {
+    const container = document.getElementById('items-container');
+    const row = document.createElement('div');
+    row.classList.add('row', 'item-row', 'mb-2');
+    row.innerHTML = `
+        <div class="col-md-6">
+            <input type="text" class="form-control" name="product_id[]" placeholder="Product ID" required>
+        </div>
+        <div class="col-md-4">
+            <input type="number" class="form-control" name="quantity[]" placeholder="Quantity" min="1" required>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger btn-sm remove-item">×</button>
+        </div>
+    `;
+    container.appendChild(row);
+});
+
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-item')) {
+        e.target.closest('.item-row').remove();
+    }
+});
+</script>
+{% endblock %}

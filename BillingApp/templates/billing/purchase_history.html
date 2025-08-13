@@ -1,0 +1,88 @@
+{% extends 'billing/base.html' %}
+
+{% block title %}Purchase History{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4>Purchase History</h4>
+        <form method="get" class="mt-2">
+            <div class="input-group">
+                <input type="email" class="form-control" name="email" 
+                       placeholder="Filter by customer email" value="{{ email_filter }}">
+                <button type="submit" class="btn btn-outline-secondary">Filter</button>
+                {% if email_filter %}
+                <a href="{% url 'BillingApp:purchase_history' %}" class="btn btn-outline-danger">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        {% if page_obj.object_list %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Purchase ID</th>
+                        <th>Customer Email</th>
+                        <th>Total Amount</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for purchase in page_obj %}
+                    <tr>
+                        <td>{{ purchase.purchase_id|truncatechars:8 }}...</td>
+                        <td>{{ purchase.customer.email }}</td>
+                        <td>₹{{ purchase.net_amount|floatformat:2 }}</td>
+                        <td>{{ purchase.created_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'BillingApp:bill_detail' purchase.purchase_id %}" 
+                               class="btn btn-sm btn-outline-primary">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Purchase history pagination">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if email_filter %}&email={{ email_filter }}{% endif %}">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if email_filter %}&email={{ email_filter }}{% endif %}">Previous</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if email_filter %}&email={{ email_filter }}{% endif %}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if email_filter %}&email={{ email_filter }}{% endif %}">Last</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-4">
+            <p>No purchases found.</p>
+            {% if email_filter %}
+            <p>Try <a href="{% url 'BillingApp:purchase_history' %}">viewing all purchases</a> or adjust your filter.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

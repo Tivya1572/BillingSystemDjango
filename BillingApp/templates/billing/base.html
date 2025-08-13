@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Billing System{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <style>
+        .item-row {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .product-item {
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+        .product-item:hover {
+            background-color: #e9ecef;
+        }
+        .denomination-count {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'BillingApp:billing_form' %}">Billing System</a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="{% url 'BillingApp:billing_form' %}">New Bill</a>
+                <a class="nav-link" href="{% url 'BillingApp:purchase_history' %}">History</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Basic JavaScript functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add new item functionality
+            const addNewBtn = document.getElementById('add-new-item');
+            if (addNewBtn) {
+                addNewBtn.addEventListener('click', function() {
+                    const container = document.getElementById('items-container');
+                    const newRow = document.createElement('div');
+                    newRow.className = 'row item-row mb-2';
+                    newRow.innerHTML = `
+                        <div class="col-md-6">
+                            <input type="text" class="form-control product-id" name="product_id[]" placeholder="Product ID" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" class="form-control quantity" name="quantity[]" placeholder="Quantity" min="1" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger btn-sm remove-item">×</button>
+                        </div>
+                    `;
+                    container.appendChild(newRow);
+                    
+                    // Add remove functionality
+                    newRow.querySelector('.remove-item').addEventListener('click', function() {
+                        newRow.remove();
+                    });
+                });
+            }
+            
+            // Remove item functionality for existing items
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    button.closest('.item-row').remove();
+                });
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
