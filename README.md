@@ -1,5 +1,6 @@
 ﻿# BillingSystemDjango
 ----------- COMMANDS --------------------------------------------
+
 .\billing_env\Scripts\activate -- To activate Virtual Environment
 pip install -r requirements.txt   -- to install necessary packages
 python manage.py migrate 
@@ -14,4 +15,5 @@ python manage.py runserver -- to run the project
 "GET /billing/
 
 -------------------------------------------------------------------
+
 
